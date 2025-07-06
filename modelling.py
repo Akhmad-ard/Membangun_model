@@ -1,14 +1,10 @@
 import mlflow
-import mlflow.sklearn
+import mlflow.sklearn as mlflow_sk
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
-# Autolog semua parameter dan metrics
-mlflow.sklearn.autolog()
-
 # Load Dataset
-
 path = "./Predict_Student_Performance_preprocessing"
 
 df_train = pd.read_csv(f"{path}/train.csv")
@@ -25,6 +21,13 @@ with mlflow.start_run():
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
+    
+    mlflow_sk.log_model(
+        sk_model=model,
+        name="model",
+        input_example=X_train[0:5]
+    )
+
     mse = mean_squared_error(y_test, predictions)
     r2 = r2_score(y_test, predictions)
 
